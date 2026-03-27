@@ -1,0 +1,412 @@
+<div class="collection-carousel full-width">
+  <div class="collection-carousel__header">
+    <span class="collection-carousel__label">{{ 'collection_carousel.new_in' | t }}</span>
+
+    <div class="collection-carousel__tabs">
+      {% for block in section.blocks %}
+        {% if block.type == 'collection_tab' %}
+          <button
+            class="collection-carousel__tab{% if forloop.first %} collection-carousel__tab--active{% endif %}"
+            data-tab-index="{{ forloop.index0 }}"
+            {{ block.shopify_attributes }}
+          >
+            {{ block.settings.tab_label }}
+          </button>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="collection-carousel__controls">
+      <span class="collection-carousel__counter">
+        <span data-current-page>1</span>/<span data-total-pages>1</span>
+      </span>
+      <button class="collection-carousel__arrow" data-direction="prev" aria-label="{{ 'collection_carousel.previous' | t }}">
+        {{ 'collection_carousel.previous' | t | upcase }}
+      </button>
+      <button class="collection-carousel__arrow collection-carousel__arrow--next" data-direction="next" aria-label="{{ 'collection_carousel.next' | t }}">
+        {{ 'collection_carousel.next' | t | upcase }}
+      </button>
+    </div>
+  </div>
+
+  <div class="collection-carousel__track-wrapper">
+    {% for block in section.blocks %}
+      {% if block.type == 'collection_tab' %}
+        {% assign collection = block.settings.collection %}
+        <div
+          class="collection-carousel__track{% if forloop.first %} collection-carousel__track--active{% endif %}"
+          data-tab-track="{{ forloop.index0 }}"
+        >
+          {% if collection != blank %}
+            {% for product in collection.products limit: 12 %}
+              <div class="collection-carousel__card">
+                <div class="collection-carousel__image-wrapper">
+                  {% if product.featured_image != blank %}
+                    <img
+                      src="{{ product.featured_image | image_url: width: 600, height: 800, crop: 'center' }}"
+                      alt="{{ product.featured_image.alt | escape }}"
+                      loading="lazy"
+                      width="600"
+                      height="800"
+                      class="collection-carousel__image"
+                    >
+                  {% else %}
+                    {{ 'product-1' | placeholder_svg_tag: 'collection-carousel__image collection-carousel__placeholder' }}
+                  {% endif %}
+
+                  <button class="collection-carousel__wishlist" aria-label="{{ 'collection_carousel.add_to_wishlist' | t }}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 1.5H15V16.5L9 12.75L3 16.5V1.5Z" stroke="currentColor" stroke-width="1" fill="none"/>
+                    </svg>
+                  </button>
+
+                  <button class="collection-carousel__add-to-cart" aria-label="{{ 'collection_carousel.add_to_cart' | t }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="0.5" y="0.5" width="15" height="15" stroke="currentColor" fill="none"/>
+                      <line x1="8" y1="4" x2="8" y2="12" stroke="currentColor" stroke-width="1"/>
+                      <line x1="4" y1="8" x2="12" y2="8" stroke="currentColor" stroke-width="1"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="collection-carousel__info">
+                  <span class="collection-carousel__vendor">{{ product.vendor }}</span>
+                  <span class="collection-carousel__title">{{ product.title }}</span>
+                  <span class="collection-carousel__price">{{ product.price | money }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..4) %}
+              <div class="collection-carousel__card">
+                <div class="collection-carousel__image-wrapper">
+                  {{ 'product-1' | placeholder_svg_tag: 'collection-carousel__image collection-carousel__placeholder' }}
+                  <button class="collection-carousel__wishlist" aria-label="{{ 'collection_carousel.add_to_wishlist' | t }}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 1.5H15V16.5L9 12.75L3 16.5V1.5Z" stroke="currentColor" stroke-width="1" fill="none"/>
+                    </svg>
+                  </button>
+                  <button class="collection-carousel__add-to-cart" aria-label="{{ 'collection_carousel.add_to_cart' | t }}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="0.5" y="0.5" width="15" height="15" stroke="currentColor" fill="none"/>
+                      <line x1="8" y1="4" x2="8" y2="12" stroke="currentColor" stroke-width="1"/>
+                      <line x1="4" y1="8" x2="12" y2="8" stroke="currentColor" stroke-width="1"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="collection-carousel__info">
+                  <span class="collection-carousel__vendor">Brand</span>
+                  <span class="collection-carousel__title">Product title</span>
+                  <span class="collection-carousel__price">$0.00</span>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .collection-carousel {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .collection-carousel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px var(--page-margin) 20px;
+    gap: 24px;
+    border-bottom: 1px solid var(--color-foreground);
+  }
+
+  .collection-carousel__label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .collection-carousel__tabs {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .collection-carousel__tab {
+    background: none;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--color-foreground);
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  .collection-carousel__tab--active {
+    border-color: var(--color-foreground);
+  }
+
+  .collection-carousel__controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+  }
+
+  .collection-carousel__counter {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+  }
+
+  .collection-carousel__arrow {
+    background: none;
+    border: none;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    color: var(--color-foreground);
+    font-family: inherit;
+    padding: 0;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+
+  .collection-carousel__arrow--next {
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  .collection-carousel__track-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .collection-carousel__track {
+    display: flex;
+    gap: 2px;
+    transition: transform 0.5s ease;
+    display: none;
+  }
+
+  .collection-carousel__track--active {
+    display: flex;
+  }
+
+  .collection-carousel__card {
+    flex: 0 0 25%;
+    min-width: 0;
+  }
+
+  .collection-carousel__image-wrapper {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .collection-carousel__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .collection-carousel__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .collection-carousel__wishlist {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-foreground);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .collection-carousel__add-to-cart {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-foreground);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .collection-carousel__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px var(--page-margin) 24px;
+  }
+
+  .collection-carousel__vendor {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .collection-carousel__title {
+    font-size: 13px;
+  }
+
+  .collection-carousel__price {
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 768px) {
+    .collection-carousel__header {
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px var(--page-margin) 12px;
+    }
+
+    .collection-carousel__card {
+      flex: 0 0 70%;
+    }
+
+    .collection-carousel__track {
+      padding-left: var(--page-margin);
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function () {
+    var section = document.querySelector('.collection-carousel');
+    if (!section) return;
+
+    var tabs = section.querySelectorAll('[data-tab-index]');
+    var tracks = section.querySelectorAll('[data-tab-track]');
+    var prevBtn = section.querySelector('[data-direction="prev"]');
+    var nextBtn = section.querySelector('[data-direction="next"]');
+    var currentPageEl = section.querySelector('[data-current-page]');
+    var totalPagesEl = section.querySelector('[data-total-pages]');
+
+    var currentPage = 0;
+    var itemsPerPage = window.innerWidth <= 768 ? 1 : 4;
+
+    function getActiveTrack() {
+      return section.querySelector('.collection-carousel__track--active');
+    }
+
+    function getCardCount() {
+      var track = getActiveTrack();
+      return track ? track.querySelectorAll('.collection-carousel__card').length : 0;
+    }
+
+    function getTotalPages() {
+      return Math.ceil(getCardCount() / itemsPerPage);
+    }
+
+    function updateCounter() {
+      var total = getTotalPages();
+      currentPageEl.textContent = currentPage + 1;
+      totalPagesEl.textContent = total;
+      prevBtn.style.opacity = currentPage === 0 ? '0.3' : '0.5';
+      prevBtn.style.fontWeight = currentPage === 0 ? '400' : '400';
+      nextBtn.style.opacity = currentPage >= total - 1 ? '0.3' : '1';
+      nextBtn.style.fontWeight = currentPage >= total - 1 ? '400' : '600';
+    }
+
+    function slideTo(page) {
+      var track = getActiveTrack();
+      if (!track) return;
+      var total = getTotalPages();
+      if (page < 0 || page >= total) return;
+      currentPage = page;
+      var offset = currentPage * itemsPerPage * (100 / itemsPerPage);
+      track.style.transform = 'translateX(-' + offset + '%)';
+      updateCounter();
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.remove('collection-carousel__tab--active'); });
+        tab.classList.add('collection-carousel__tab--active');
+        var index = tab.getAttribute('data-tab-index');
+        tracks.forEach(function (t) { t.classList.remove('collection-carousel__track--active'); t.style.transform = ''; });
+        var target = section.querySelector('[data-tab-track="' + index + '"]');
+        if (target) target.classList.add('collection-carousel__track--active');
+        currentPage = 0;
+        updateCounter();
+      });
+    });
+
+    prevBtn.addEventListener('click', function () { slideTo(currentPage - 1); });
+    nextBtn.addEventListener('click', function () { slideTo(currentPage + 1); });
+
+    window.addEventListener('resize', function () {
+      itemsPerPage = window.innerWidth <= 768 ? 1 : 4;
+      currentPage = 0;
+      var track = getActiveTrack();
+      if (track) track.style.transform = '';
+      updateCounter();
+    });
+
+    updateCounter();
+  })();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.collection_carousel",
+  "blocks": [
+    {
+      "type": "collection_tab",
+      "name": "t:general.collection_tab",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tab_label",
+          "label": "t:labels.tab_label",
+          "default": "Collection"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:labels.collection"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.collection_carousel",
+      "blocks": [
+        {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Main SS26"
+          }
+        },
+        {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Travel SS26"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

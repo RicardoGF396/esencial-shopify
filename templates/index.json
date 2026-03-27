@@ -9,12 +9,33 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "background_image": "https://8pm.it/cdn/shop/files/Progetto_senza_titolo_-_2026-02-23T145702.605.png?v=1771855605&width=2000"
+      }
+    },
+    "collection-carousel": {
+      "type": "collection-carousel",
+      "blocks": {
+        "tab-1": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Main SS26"
+          }
+        },
+        "tab-2": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Travel SS26"
+          }
+        }
+      },
+      "block_order": ["tab-1", "tab-2"]
     }
   },
   "order": [
-    "main"
+    "hero",
+    "collection-carousel"
   ]
 }

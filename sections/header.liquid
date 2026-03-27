@@ -1,60 +1,98 @@
-<header>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+<header class="header">
+  <nav class="header__left">
+    <button class="header__link">{{ 'header.new_products' | t }}</button>
+    <button class="header__link">{{ 'header.shop' | t }}</button>
+    <a href="/collections/all" class="header__link">{{ 'header.archive' | t }}</a>
+  </nav>
 
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
+  <div class="header__center">
+    <a href="{{ routes.root_url }}" class="header__logo">
+      <img src="{{ 'logo.svg' | asset_url }}" alt="{{ shop.name }}" class="header__logo-img">
+    </a>
   </div>
 
-  <div class="header__icons">
-    {% if shop.customer_accounts_enabled %}
-      <shopify-account menu="{{ section.settings.customer_account_menu }}">
-        {{ 'icon-account.svg' | inline_asset_content }}
-      </shopify-account>
-    {% endif %}
-
-    <a href="{{ routes.cart_url }}">
-      {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
-      {% endif %}
-
-      {{ 'icon-cart.svg' | inline_asset_content }}
+  <div class="header__right">
+    <a href="{{ routes.account_url }}" class="header__link">
+      {{ 'header.account' | t }}
+    </a>
+    <a href="/pages/wishlist" class="header__link">
+      {{ 'header.wishlist' | t }}
+    </a>
+    <a href="{{ routes.cart_url }}" class="header__cart">
+      {{ cart.item_count }}
     </a>
   </div>
 </header>
 
 {% stylesheet %}
-  header {
-    height: 5rem;
-    display: flex;
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
+    height: 3rem;
+    gap: 1rem;
   }
-  header a {
-    position: relative;
+  .header__left {
+    display: flex;
+    gap: 1.5rem;
+    justify-self: start;
+  }
+  .header__center {
+    justify-self: center;
+  }
+  .header__right {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-self: end;
+  }
+  .header__link {
     text-decoration: none;
     color: var(--color-foreground);
+    font-size: 0.73rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+  .header__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .header__logo-img {
+    height: 1.5rem;
+    width: auto;
+  }
+
+  .header__cart {
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
-  }
-  header svg {
     width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--color-foreground);
+    text-decoration: none;
+    color: var(--color-foreground);
+    font-size: 0.85rem;
   }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
+
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
   }
+
+  button.header__link {
+    text-decoration: none;
+    color: var(--color-foreground);
+    font-size: 0.73rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+  }
+
 {% endstylesheet %}
 
 {% schema %}
@@ -65,12 +103,6 @@
       "type": "link_list",
       "id": "menu",
       "label": "t:labels.menu"
-    },
-    {
-      "type": "link_list",
-      "id": "customer_account_menu",
-      "label": "t:labels.customer_account_menu",
-      "default": "customer-account-main-menu"
     }
   ]
 }

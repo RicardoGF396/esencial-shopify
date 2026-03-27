@@ -30,6 +30,39 @@
   "collections": {
     "title": "Collections"
   },
+  "footer": {
+    "contact_us": "Contact us",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "store": "Store",
+    "shipping": "Shipping",
+    "payments": "Payments",
+    "returns": "Returns and refunds",
+    "join_community": "Join the community",
+    "join_description": "Sign up and get 10% off your first order",
+    "email_placeholder": "Email",
+    "privacy_consent": "By signing up, you accept our privacy policy.",
+    "subscribe": "Subscribe now",
+    "shipping_country": "Shipping: MX",
+    "language": "Language: ES",
+    "about_us": "About us",
+    "travel_capsule": "Travel capsule",
+    "contact": "Contact",
+    "privacy_policy": "Privacy policy",
+    "terms": "Terms and conditions",
+    "instagram": "Instagram",
+    "powered_by": "Powered by"
+  },
+  "topbar": {
+    "announcement_text": "Free shipping on orders over $150 USD"
+  },
+  "header": {
+    "new_products":"New products",
+    "shop":"Shop",
+    "archive":"Archive",
+    "account": "Account",
+    "wishlist": "Wishlist"
+  },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
     "card": "Gift card",
@@ -48,5 +81,12 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "collection_carousel": {
+    "new_in": "New in",
+    "previous": "Previous",
+    "next": "Next",
+    "add_to_wishlist": "Add to wishlist",
+    "add_to_cart": "Add to cart"
   }
 }

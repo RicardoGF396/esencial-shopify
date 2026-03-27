@@ -1,0 +1,90 @@
+<div
+  class="hero full-width {{ section.settings.section_height }}"
+  style="--hero-bg: {{ section.settings.background_color }}"
+>
+  {% if section.settings.background_image != blank %}
+    <img
+      src="{{ section.settings.background_image }}"
+      alt=""
+      class="hero__background"
+    >
+  {% endif %}
+  <div class="hero__content">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .hero {
+    position: relative;
+    overflow: hidden;
+    width: 100dvw;
+    background-color: var(--hero-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero__background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+  .hero--full {
+    min-height: 85dvh;
+  }
+  .hero--large {
+    min-height: 80vh;
+  }
+  .hero--medium {
+    min-height: 60vh;
+  }
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: var(--content-grid);
+    width: 100%;
+  }
+  .hero__content > * {
+    grid-column: 2;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.hero",
+  "blocks": [{ "type": "@theme" }],
+  "settings": [
+    {
+      "type": "text",
+      "id": "background_image",
+      "label": "t:labels.background_image"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.background",
+      "default": "#e5e5e5"
+    },
+    {
+      "type": "select",
+      "id": "section_height",
+      "label": "t:labels.section_height",
+      "default": "hero--full",
+      "options": [
+        { "value": "hero--full", "label": "t:options.section_height.full" },
+        { "value": "hero--large", "label": "t:options.section_height.large" },
+        { "value": "hero--medium", "label": "t:options.section_height.medium" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.hero"
+    }
+  ]
+}
+{% endschema %}

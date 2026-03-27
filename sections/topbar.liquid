@@ -1,0 +1,37 @@
+<div class="topbar full-width">
+  <p class="topbar__announcement">
+    {{ 'topbar.announcement_text' | t }}
+  </p>
+</div>
+
+{% stylesheet %}
+  .topbar {
+    background-color: #fff;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #CCCCCC;
+  }
+  .topbar__announcement {
+    font-size: 0.70rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.topbar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "announcement_text",
+      "label": "t:labels.announcement_text",
+      "default": "Envío gratuito en pedidos superiores a 150 €"
+    }
+  ]
+}
+{% endschema %}
