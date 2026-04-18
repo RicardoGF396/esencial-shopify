@@ -34,10 +34,90 @@
         }
       },
       "block_order": ["tab-1", "tab-2"]
+    },
+    "featured-collections": {
+      "type": "featured-collections",
+      "blocks": {
+        "fc-1": {
+          "type": "collection_card",
+          "settings": {
+            "title": "Main SS26",
+            "subtitle": "Spring Summer 2026",
+            "collection": "main-ss26"
+          }
+        },
+        "fc-2": {
+          "type": "collection_card",
+          "settings": {
+            "title": "Travel capsule",
+            "subtitle": "Essentials",
+            "collection": "archive"
+          }
+        }
+      },
+      "block_order": ["fc-1", "fc-2"]
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "image-with-text--default",
+        "background_color": "#FFFFFF"
+      }
+    },
+    "lookbook-grid": {
+      "type": "lookbook-grid",
+      "settings": {
+        "heading": "Lookbook"
+      },
+      "blocks": {
+        "lb-1": {
+          "type": "image",
+          "settings": {
+            "size": "lookbook-grid__item--wide"
+          }
+        },
+        "lb-2": {
+          "type": "image",
+          "settings": {
+            "size": "lookbook-grid__item--default"
+          }
+        },
+        "lb-3": {
+          "type": "image",
+          "settings": {
+            "size": "lookbook-grid__item--default"
+          }
+        },
+        "lb-4": {
+          "type": "image",
+          "settings": {
+            "size": "lookbook-grid__item--default"
+          }
+        },
+        "lb-5": {
+          "type": "image",
+          "settings": {
+            "size": "lookbook-grid__item--wide"
+          }
+        }
+      },
+      "block_order": ["lb-1", "lb-2", "lb-3", "lb-4", "lb-5"]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Join the community",
+        "description": "Sign up for our newsletter and get 10% off your first order.",
+        "background_color": "#f0f0f0"
+      }
     }
   },
   "order": [
     "hero",
-    "collection-carousel"
+    "collection-carousel",
+    "featured-collections",
+    "image-with-text",
+    "lookbook-grid",
+    "newsletter"
   ]
 }

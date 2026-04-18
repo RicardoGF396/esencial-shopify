@@ -1,0 +1,142 @@
+<div
+  class="image-with-text full-width {{ section.settings.layout }}"
+  style="--iwt-bg: {{ section.settings.background_color }}"
+>
+  <div class="image-with-text__media">
+    {% if section.settings.image != blank %}
+      {{ section.settings.image | image_url: width: 1200, height: 1600, crop: 'center' | image_tag:
+        class: 'image-with-text__image',
+        loading: 'lazy'
+      }}
+    {% else %}
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'image-with-text__image image-with-text__placeholder' }}
+    {% endif %}
+  </div>
+
+  <div class="image-with-text__content">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .image-with-text {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background-color: var(--iwt-bg);
+  }
+
+  .image-with-text--reversed .image-with-text__media {
+    order: 2;
+  }
+
+  .image-with-text--reversed .image-with-text__content {
+    order: 1;
+  }
+
+  .image-with-text__media {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .image-with-text__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-with-text__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-with-text__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px;
+    gap: 20px;
+  }
+
+  .image-with-text__heading {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .image-with-text__body {
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  .image-with-text__link {
+    display: inline-block;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-foreground);
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
+  }
+
+  .image-with-text__link:hover {
+    opacity: 0.7;
+  }
+
+  @media (max-width: 768px) {
+    .image-with-text {
+      grid-template-columns: 1fr;
+    }
+
+    .image-with-text--reversed .image-with-text__media {
+      order: 1;
+    }
+
+    .image-with-text--reversed .image-with-text__content {
+      order: 2;
+    }
+
+    .image-with-text__content {
+      padding: 32px var(--page-margin);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.image_with_text",
+  "blocks": [{ "type": "@theme" }],
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.image"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:labels.layout",
+      "default": "image-with-text--default",
+      "options": [
+        { "value": "image-with-text--default", "label": "t:options.layout.image_first" },
+        { "value": "image-with-text--reversed", "label": "t:options.layout.text_first" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.background",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.image_with_text"
+    }
+  ]
+}
+{% endschema %}

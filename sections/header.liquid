@@ -1,6 +1,6 @@
 {% assign menu = section.settings.menu %}
 
-<header class="header full-width">
+<header class="header full-width" data-header>
   <!-- Desktop -->
   <div class="header__desktop">
     <nav class="header__left">
@@ -10,6 +10,8 @@
             <button
               class="header__link header__nav-trigger"
               data-mega-trigger="{{ link.title | handleize }}"
+              aria-expanded="false"
+              aria-controls="mega-{{ link.title | handleize }}"
             >
               {{ link.title }}
             </button>
@@ -51,22 +53,94 @@
   {% if menu != blank %}
     {% for link in menu.links %}
       {% if link.links.size > 0 %}
-        <div class="header__mega" data-mega="{{ link.title | handleize }}">
-          <div class="header__mega-inner">
-            {% for child in link.links %}
-              <div class="header__mega-col">
-                {% if child.links.size > 0 %}
-                  <span class="header__mega-heading">{{ child.title }}</span>
-                  <ul class="header__mega-list">
-                    {% for grandchild in child.links %}
-                      <li><a href="{{ grandchild.url }}" class="header__mega-link">{{ grandchild.title }}</a></li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <a href="{{ child.url }}" class="header__mega-heading header__mega-heading--link">{{ child.title }}</a>
-                {% endif %}
+        {% assign mega_handle = link.title | handleize %}
+
+        {% comment %} Find matching block for this menu item {% endcomment %}
+        {% assign mega_block = nil %}
+        {% for block in section.blocks %}
+          {% if block.type == 'mega_menu' %}
+            {% if block.settings.menu_item == link.title %}
+              {% assign mega_block = block %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        <div
+          class="mega"
+          id="mega-{{ mega_handle }}"
+          data-mega="{{ mega_handle }}"
+          aria-hidden="true"
+        >
+          <div class="mega__overlay" data-mega-overlay></div>
+          <div class="mega__panel">
+            <div class="mega__inner">
+              <!-- Link columns -->
+              <div class="mega__links">
+                {% for child in link.links %}
+                  <div class="mega__col">
+                    {% if child.links.size > 0 %}
+                      <span class="mega__col-heading">{{ child.title }}</span>
+                      <ul class="mega__col-list">
+                        {% for grandchild in child.links %}
+                          <li>
+                            <a href="{{ grandchild.url }}" class="mega__col-link">{{ grandchild.title }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% else %}
+                      <a href="{{ child.url }}" class="mega__col-heading mega__col-heading--link">{{ child.title }}</a>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+
+                <div class="mega__col mega__col--view-all">
+                  <a href="{{ link.url }}" class="mega__view-all">
+                    {{ 'header.view_all' | t }} {{ link.title }}
+                    <span class="mega__view-all-arrow">&rarr;</span>
+                  </a>
+                </div>
               </div>
-            {% endfor %}
+
+              <!-- Featured image (from block settings) -->
+              {% if mega_block != nil %}
+                <div class="mega__featured">
+                  {% if mega_block.settings.featured_image != blank %}
+                    <a
+                      href="{{ mega_block.settings.featured_link | default: link.url }}"
+                      class="mega__featured-link"
+                      {{ mega_block.shopify_attributes }}
+                    >
+                      <div class="mega__featured-image-wrap">
+                        {{ mega_block.settings.featured_image | image_url: width: 600, height: 800, crop: 'center' | image_tag:
+                          class: 'mega__featured-image',
+                          loading: 'lazy'
+                        }}
+                      </div>
+                      {% if mega_block.settings.featured_caption != blank %}
+                        <span class="mega__featured-caption">{{ mega_block.settings.featured_caption }}</span>
+                      {% endif %}
+                    </a>
+                  {% endif %}
+
+                  {% if mega_block.settings.featured_image_2 != blank %}
+                    <a
+                      href="{{ mega_block.settings.featured_link_2 | default: link.url }}"
+                      class="mega__featured-link"
+                    >
+                      <div class="mega__featured-image-wrap">
+                        {{ mega_block.settings.featured_image_2 | image_url: width: 600, height: 800, crop: 'center' | image_tag:
+                          class: 'mega__featured-image',
+                          loading: 'lazy'
+                        }}
+                      </div>
+                      {% if mega_block.settings.featured_caption_2 != blank %}
+                        <span class="mega__featured-caption">{{ mega_block.settings.featured_caption_2 }}</span>
+                      {% endif %}
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
           </div>
         </div>
       {% endif %}
@@ -263,6 +337,7 @@
   .header {
     position: relative;
     border-bottom: 1px solid #ccc;
+    z-index: 100;
   }
 
   .header__desktop {
@@ -285,6 +360,23 @@
     height: 100%;
     display: flex;
     align-items: center;
+    position: relative;
+  }
+
+  .header__nav-trigger::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-foreground);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+
+  .header__nav-trigger--active::after {
+    transform: scaleX(1);
   }
 
   .header__center {
@@ -324,34 +416,77 @@
   }
 
   /* === Mega menu === */
-  .header__mega {
-    display: none;
+  .mega {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
+    z-index: 200;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .mega--active {
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .mega__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.3s ease;
+    z-index: -1;
+  }
+
+  .mega--active .mega__overlay {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .mega__panel {
     background: var(--color-background);
     border-bottom: 1px solid #ccc;
-    padding: 2rem var(--page-margin);
-    z-index: 100;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.25s ease;
   }
 
-  .header__mega--active {
-    display: block;
+  .mega--active .mega__panel {
+    transform: translateY(0);
+    opacity: 1;
   }
 
-  .header__mega-inner {
+  .mega__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    padding: 40px var(--page-margin);
+    max-width: var(--page-width);
+    margin: 0 auto;
+  }
+
+  .mega__links {
     display: flex;
-    gap: 3rem;
+    gap: 48px;
+    flex-wrap: wrap;
   }
 
-  .header__mega-col {
+  .mega__col {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 140px;
   }
 
-  .header__mega-heading {
+  .mega__col--view-all {
+    align-self: flex-end;
+    margin-top: auto;
+  }
+
+  .mega__col-heading {
     font-size: 0.73rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -360,15 +495,16 @@
     margin-bottom: 0.5rem;
   }
 
-  .header__mega-heading--link {
+  .mega__col-heading--link {
     text-decoration: none;
+    transition: opacity 0.2s;
   }
 
-  .header__mega-heading--link:hover {
+  .mega__col-heading--link:hover {
     opacity: 0.7;
   }
 
-  .header__mega-list {
+  .mega__col-list {
     list-style: none;
     padding: 0;
     display: flex;
@@ -376,17 +512,82 @@
     gap: 0.5rem;
   }
 
-  .header__mega-link {
+  .mega__col-link {
     font-size: 0.73rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-decoration: none;
     color: var(--color-foreground);
     font-weight: 400;
+    transition: opacity 0.2s;
   }
 
-  .header__mega-link:hover {
+  .mega__col-link:hover {
+    opacity: 0.6;
+  }
+
+  .mega__view-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.73rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--color-foreground);
+    font-weight: 600;
+    border-bottom: 1px solid var(--color-foreground);
+    padding-bottom: 2px;
+    transition: opacity 0.2s;
+  }
+
+  .mega__view-all:hover {
     opacity: 0.7;
+  }
+
+  .mega__view-all-arrow {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  /* Featured images */
+  .mega__featured {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .mega__featured-link {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--color-foreground);
+    width: 220px;
+  }
+
+  .mega__featured-image-wrap {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .mega__featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .mega__featured-link:hover .mega__featured-image {
+    transform: scale(1.03);
+  }
+
+  .mega__featured-caption {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 10px 0;
   }
 
   /* === Mobile bar (hidden on desktop) === */
@@ -412,7 +613,7 @@
       display: none;
     }
 
-    .header__mega {
+    .mega {
       display: none !important;
     }
 
@@ -599,7 +800,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    var header = document.querySelector('.header');
+    var header = document.querySelector('[data-header]');
     var dialog = document.querySelector('[data-mobile-menu]');
     if (!header) return;
 
@@ -607,17 +808,46 @@
     var triggers = header.querySelectorAll('[data-mega-trigger]');
     var megas = header.querySelectorAll('[data-mega]');
     var closeTimeout = null;
+    var activeMega = null;
 
     function openMega(id) {
       clearTimeout(closeTimeout);
-      megas.forEach(function (m) { m.classList.remove('header__mega--active'); });
+
+      if (activeMega && activeMega.getAttribute('data-mega') !== id) {
+        activeMega.classList.remove('mega--active');
+        activeMega.setAttribute('aria-hidden', 'true');
+      }
+
       var target = header.querySelector('[data-mega="' + id + '"]');
-      if (target) target.classList.add('header__mega--active');
+      if (target) {
+        target.classList.add('mega--active');
+        target.setAttribute('aria-hidden', 'false');
+        activeMega = target;
+      }
+
+      triggers.forEach(function (t) {
+        t.classList.toggle(
+          'header__nav-trigger--active',
+          t.getAttribute('data-mega-trigger') === id
+        );
+        t.setAttribute(
+          'aria-expanded',
+          t.getAttribute('data-mega-trigger') === id ? 'true' : 'false'
+        );
+      });
     }
 
-    function closeMegas() {
+    function closeAllMegas() {
       closeTimeout = setTimeout(function () {
-        megas.forEach(function (m) { m.classList.remove('header__mega--active'); });
+        megas.forEach(function (m) {
+          m.classList.remove('mega--active');
+          m.setAttribute('aria-hidden', 'true');
+        });
+        triggers.forEach(function (t) {
+          t.classList.remove('header__nav-trigger--active');
+          t.setAttribute('aria-expanded', 'false');
+        });
+        activeMega = null;
       }, 150);
     }
 
@@ -625,12 +855,12 @@
       trigger.addEventListener('mouseenter', function () {
         openMega(trigger.getAttribute('data-mega-trigger'));
       });
-      trigger.addEventListener('mouseleave', closeMegas);
+      trigger.addEventListener('mouseleave', closeAllMegas);
       trigger.addEventListener('click', function () {
         var id = trigger.getAttribute('data-mega-trigger');
         var target = header.querySelector('[data-mega="' + id + '"]');
-        if (target && target.classList.contains('header__mega--active')) {
-          target.classList.remove('header__mega--active');
+        if (target && target.classList.contains('mega--active')) {
+          closeAllMegas();
         } else {
           openMega(id);
         }
@@ -638,13 +868,41 @@
     });
 
     megas.forEach(function (mega) {
-      mega.addEventListener('mouseenter', function () { clearTimeout(closeTimeout); });
-      mega.addEventListener('mouseleave', closeMegas);
+      mega.querySelector('.mega__panel').addEventListener('mouseenter', function () {
+        clearTimeout(closeTimeout);
+      });
+      mega.querySelector('.mega__panel').addEventListener('mouseleave', closeAllMegas);
     });
 
-    document.addEventListener('click', function (e) {
-      if (!e.target.closest('[data-mega-trigger]') && !e.target.closest('[data-mega]')) {
-        megas.forEach(function (m) { m.classList.remove('header__mega--active'); });
+    /* Close on overlay click */
+    header.querySelectorAll('[data-mega-overlay]').forEach(function (overlay) {
+      overlay.addEventListener('click', function () {
+        clearTimeout(closeTimeout);
+        megas.forEach(function (m) {
+          m.classList.remove('mega--active');
+          m.setAttribute('aria-hidden', 'true');
+        });
+        triggers.forEach(function (t) {
+          t.classList.remove('header__nav-trigger--active');
+          t.setAttribute('aria-expanded', 'false');
+        });
+        activeMega = null;
+      });
+    });
+
+    /* Close on Escape */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && activeMega) {
+        clearTimeout(closeTimeout);
+        megas.forEach(function (m) {
+          m.classList.remove('mega--active');
+          m.setAttribute('aria-hidden', 'true');
+        });
+        triggers.forEach(function (t) {
+          t.classList.remove('header__nav-trigger--active');
+          t.setAttribute('aria-expanded', 'false');
+        });
+        activeMega = null;
       }
     });
 
@@ -678,14 +936,9 @@
       });
     }
 
-    /* Close on backdrop click */
     dialog.addEventListener('click', function (e) {
-      if (e.target === dialog) {
-        dialog.close();
-      }
+      if (e.target === dialog) dialog.close();
     });
-
-    /* Close on Escape is handled natively by dialog */
 
     /* Navigate forward */
     dialog.querySelectorAll('[data-go-to]').forEach(function (btn) {
@@ -716,8 +969,6 @@
         if (!current || !prev) return;
 
         current.classList.remove('mobile-menu__panel--active');
-        /* Reset to right side (default translateX(100%)) */
-
         prev.classList.remove('mobile-menu__panel--exit-left');
         prev.classList.add('mobile-menu__panel--active');
       });
@@ -733,6 +984,50 @@
       "type": "link_list",
       "id": "menu",
       "label": "t:labels.menu"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "t:general.mega_menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:labels.menu_item",
+          "info": "t:labels.menu_item_info"
+        },
+        {
+          "type": "image_picker",
+          "id": "featured_image",
+          "label": "t:labels.featured_image"
+        },
+        {
+          "type": "text",
+          "id": "featured_caption",
+          "label": "t:labels.featured_caption"
+        },
+        {
+          "type": "url",
+          "id": "featured_link",
+          "label": "t:labels.featured_link"
+        },
+        {
+          "type": "image_picker",
+          "id": "featured_image_2",
+          "label": "t:labels.featured_image_2"
+        },
+        {
+          "type": "text",
+          "id": "featured_caption_2",
+          "label": "t:labels.featured_caption_2"
+        },
+        {
+          "type": "url",
+          "id": "featured_link_2",
+          "label": "t:labels.featured_link_2"
+        }
+      ]
     }
   ]
 }

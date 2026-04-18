@@ -35,7 +35,13 @@
     "theme": "Theme",
     "typography": "Typography",
     "collection_carousel": "Collection carousel",
-    "collection_tab": "Collection tab"
+    "collection_tab": "Collection tab",
+    "featured_collections": "Featured collections",
+    "image_with_text": "Image with text",
+    "image": "Image",
+    "lookbook_grid": "Lookbook grid",
+    "newsletter": "Newsletter",
+    "mega_menu": "Mega menu"
   },
   "labels": {
     "alignment": "Alignment",
@@ -60,7 +66,24 @@
     "text_style": "Text style",
     "text": "Text",
     "tab_label": "Tab label",
-    "collection": "Collection"
+    "collection": "Collection",
+    "title": "Title",
+    "subtitle": "Subtitle",
+    "image": "Image",
+    "layout": "Layout",
+    "heading": "Heading",
+    "description": "Description",
+    "caption": "Caption",
+    "url": "URL",
+    "size": "Size",
+    "menu_item": "Menu item",
+    "menu_item_info": "Enter the exact title of a top-level menu item to attach this mega menu to.",
+    "featured_image": "Featured image",
+    "featured_caption": "Featured caption",
+    "featured_link": "Featured link",
+    "featured_image_2": "Featured image 2",
+    "featured_caption_2": "Featured caption 2",
+    "featured_link_2": "Featured link 2"
   },
   "options": {
     "alignment": {
@@ -89,6 +112,15 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
+    },
+    "layout": {
+      "image_first": "Image first",
+      "text_first": "Text first"
+    },
+    "size": {
+      "default": "Default",
+      "wide": "Wide",
+      "tall": "Tall"
     }
   }
 }

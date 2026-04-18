@@ -17,7 +17,14 @@
     "checkout": "Checkout",
     "title": "Cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "empty": "Your cart is empty.",
+    "continue_shopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "shipping_note": "Shipping and taxes calculated at checkout.",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "quantity": "Quantity"
   },
   "customers": {
     "login": {
@@ -25,6 +32,31 @@
       "password": "Password",
       "submit": "Sign in",
       "title": "Login"
+    }
+  },
+  "collection": {
+    "product_count": "{{ count }} products",
+    "pagination": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "filter": "Filter",
+    "filters": "Filters",
+    "sort_by": "Sort by",
+    "apply_filters": "Apply",
+    "clear_all": "Clear all",
+    "no_products": "No products match your filters.",
+    "search_filter": "Search...",
+    "price_min": "Min",
+    "price_max": "Max",
+    "sort_options": {
+      "manual": "Featured",
+      "best_selling": "Best selling",
+      "title_ascending": "A–Z",
+      "title_descending": "Z–A",
+      "price_ascending": "Price, low to high",
+      "price_descending": "Price, high to low",
+      "created_ascending": "Oldest",
+      "created_descending": "Newest"
     }
   },
   "collections": {
@@ -69,7 +101,8 @@
     "back_to": "Back to",
     "shipping_info": "Shipping: US",
     "register": "Register",
-    "contacts": "Contacts"
+    "contacts": "Contacts",
+    "view_all": "View all"
   },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
@@ -88,7 +121,20 @@
     "placeholder": "Search articles, pages, or products",
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
-    "results_for_html": "{{ count }} results found for {{ terms }}"
+    "results_for_html": "{{ count }} results found for {{ terms }}",
+    "pagination": "Search pagination"
+  },
+  "product": {
+    "add_to_cart": "Add to cart",
+    "sold_out": "Sold out",
+    "quantity": "Quantity",
+    "decrease_quantity": "Decrease quantity",
+    "increase_quantity": "Increase quantity",
+    "description": "Description",
+    "care": "Care instructions",
+    "shipping_returns": "Shipping & returns",
+    "shipping_info": "Free shipping on orders over $150 USD. Returns accepted within 14 days.",
+    "variant": "Variant"
   },
   "collection_carousel": {
     "new_in": "New in",
@@ -96,5 +142,10 @@
     "next": "Next",
     "add_to_wishlist": "Add to wishlist",
     "add_to_cart": "Add to cart"
+  },
+  "newsletter": {
+    "email_placeholder": "Email",
+    "subscribe": "Subscribe",
+    "privacy_consent": "By signing up, you accept our privacy policy."
   }
 }

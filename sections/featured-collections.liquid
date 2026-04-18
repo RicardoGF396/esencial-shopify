@@ -1,0 +1,158 @@
+<div class="featured-collections full-width">
+  {% for block in section.blocks %}
+    {% if block.type == 'collection_card' %}
+      {% assign collection = block.settings.collection %}
+      <a
+        href="{{ collection.url | default: '#' }}"
+        class="featured-collections__card"
+        {{ block.shopify_attributes }}
+      >
+        <div class="featured-collections__image-wrapper">
+          {% if block.settings.image != blank %}
+            {{ block.settings.image | image_url: width: 1200, height: 1600, crop: 'center' | image_tag:
+              class: 'featured-collections__image',
+              loading: 'lazy'
+            }}
+          {% elsif collection != blank %}
+            {% if collection.featured_image != blank %}
+              {{ collection.featured_image | image_url: width: 1200, height: 1600, crop: 'center' | image_tag:
+                class: 'featured-collections__image',
+                loading: 'lazy'
+              }}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'featured-collections__image featured-collections__placeholder' }}
+            {% endif %}
+          {% else %}
+            {{ 'collection-1' | placeholder_svg_tag: 'featured-collections__image featured-collections__placeholder' }}
+          {% endif %}
+        </div>
+
+        <div class="featured-collections__info">
+          <span class="featured-collections__title">
+            {{ block.settings.title | default: collection.title | default: 'Collection' }}
+          </span>
+          {% if block.settings.subtitle != blank %}
+            <span class="featured-collections__subtitle">{{ block.settings.subtitle }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% stylesheet %}
+  .featured-collections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .featured-collections__card {
+    position: relative;
+    text-decoration: none;
+    color: var(--color-foreground);
+    overflow: hidden;
+  }
+
+  .featured-collections__image-wrapper {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background-color: #f0f0f0;
+  }
+
+  .featured-collections__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .featured-collections__card:hover .featured-collections__image {
+    transform: scale(1.03);
+  }
+
+  .featured-collections__placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  .featured-collections__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px var(--page-margin) 32px;
+  }
+
+  .featured-collections__title {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .featured-collections__subtitle {
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 768px) {
+    .featured-collections {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.featured_collections",
+  "blocks": [
+    {
+      "type": "collection_card",
+      "name": "t:general.collection_card",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:labels.collection"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:labels.image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:labels.title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "t:labels.subtitle"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.featured_collections",
+      "blocks": [
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Main SS26"
+          }
+        },
+        {
+          "type": "collection_card",
+          "settings": {
+            "title": "Travel capsule"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
