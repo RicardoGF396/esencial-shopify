@@ -1,0 +1,313 @@
+{%- comment -%}
+  Wishlist page — reads product handles from localStorage ('leon_wishlist'),
+  fetches each product via /products/{handle}.js, and renders cards.
+{%- endcomment -%}
+
+<div class="wishlist-page">
+  <div class="wishlist-page__header">
+    <h1 class="wishlist-page__title">Wishlist</h1>
+    <span class="wishlist-page__count" data-wishlist-count>0 items</span>
+  </div>
+
+  <div class="wishlist-page__empty" data-wishlist-empty hidden>
+    <svg class="wishlist-page__empty-icon" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+    <h2 class="wishlist-page__empty-title">Your wishlist is empty</h2>
+    <p class="wishlist-page__empty-desc">Save the pieces you love by tapping the heart on any product. They'll show up here so you can come back to them anytime.</p>
+    <a href="/collections/all" class="wishlist-page__empty-button">Shop all products</a>
+  </div>
+
+  <div class="wishlist-page__loading" data-wishlist-loading>
+    Loading…
+  </div>
+
+  <div class="wishlist-page__grid" data-wishlist-grid hidden></div>
+</div>
+
+{% stylesheet %}
+  .wishlist-page {
+    padding: 32px 0 64px;
+  }
+
+  .wishlist-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 24px;
+  }
+
+  .wishlist-page__title {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .wishlist-page__count {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .wishlist-page__empty,
+  .wishlist-page__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 96px 24px;
+    text-align: center;
+  }
+
+  .wishlist-page__loading {
+    font-size: 13px;
+    opacity: 0.6;
+  }
+
+  .wishlist-page__empty-icon {
+    color: var(--color-foreground);
+    opacity: 0.35;
+    margin-bottom: 8px;
+  }
+
+  .wishlist-page__empty-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .wishlist-page__empty-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    max-width: 420px;
+    opacity: 0.65;
+    margin: 0;
+  }
+
+  .wishlist-page__empty-button {
+    margin-top: 12px;
+    display: inline-block;
+    padding: 12px 32px;
+    background: var(--color-foreground);
+    color: var(--color-background);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+
+  .wishlist-page__empty-button:hover {
+    opacity: 0.85;
+  }
+
+  .wishlist-page__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .wishlist-page__card {
+    position: relative;
+    background: #f7f7f7;
+  }
+
+  .wishlist-page__card-link {
+    display: block;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .wishlist-page__img-wrap {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .wishlist-page__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  .wishlist-page__card:hover .wishlist-page__img {
+    transform: scale(1.03);
+  }
+
+  .wishlist-page__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px 16px 24px;
+  }
+
+  .wishlist-page__vendor {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .wishlist-page__name {
+    font-size: 13px;
+  }
+
+  .wishlist-page__price {
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .wishlist-page__price-compare {
+    opacity: 0.5;
+    font-weight: 400;
+    margin-right: 8px;
+    text-decoration: line-through;
+  }
+
+  .wishlist-page__remove {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .wishlist-page__remove:hover {
+    background: #fff;
+  }
+
+  @media (max-width: 1024px) {
+    .wishlist-page__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 600px) {
+    .wishlist-page__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    var KEY = 'leon_wishlist';
+    var root = document.querySelector('.wishlist-page');
+    if (!root) return;
+
+    var grid = root.querySelector('[data-wishlist-grid]');
+    var empty = root.querySelector('[data-wishlist-empty]');
+    var loading = root.querySelector('[data-wishlist-loading]');
+    var count = root.querySelector('[data-wishlist-count]');
+
+    function readHandles() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+
+    function writeHandles(list) {
+      try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+    }
+
+    function formatMoney(cents) {
+      return '$ ' + (cents / 100).toFixed(2);
+    }
+
+    function render(products) {
+      loading.hidden = true;
+      if (products.length === 0) {
+        empty.hidden = false;
+        grid.hidden = true;
+        count.textContent = '0 items';
+        return;
+      }
+      empty.hidden = true;
+      grid.hidden = false;
+      count.textContent = products.length + (products.length === 1 ? ' item' : ' items');
+
+      grid.innerHTML = products.map(function (p) {
+        var img = p.featured_image
+          ? '<img src="' + p.featured_image + '" alt="' + (p.title || '') + '" loading="lazy" class="wishlist-page__img">'
+          : '';
+        var vendor = p.vendor ? '<span class="wishlist-page__vendor">' + p.vendor + '</span>' : '';
+        var compare = (p.compare_at_price && p.compare_at_price > p.price)
+          ? '<span class="wishlist-page__price-compare">' + formatMoney(p.compare_at_price) + '</span>'
+          : '';
+        return (
+          '<div class="wishlist-page__card" data-handle="' + p.handle + '">' +
+            '<a href="' + p.url + '" class="wishlist-page__card-link">' +
+              '<div class="wishlist-page__img-wrap">' + img + '</div>' +
+              '<div class="wishlist-page__info">' +
+                vendor +
+                '<span class="wishlist-page__name">' + p.title + '</span>' +
+                '<span class="wishlist-page__price">' + compare + formatMoney(p.price) + '</span>' +
+              '</div>' +
+            '</a>' +
+            '<button type="button" class="wishlist-page__remove" data-remove="' + p.handle + '" aria-label="Remove from wishlist">×</button>' +
+          '</div>'
+        );
+      }).join('');
+
+      grid.querySelectorAll('[data-remove]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var handle = btn.getAttribute('data-remove');
+          var list = readHandles().filter(function (h) { return h !== handle; });
+          writeHandles(list);
+          load();
+        });
+      });
+    }
+
+    function load() {
+      var handles = readHandles();
+      if (handles.length === 0) {
+        render([]);
+        return;
+      }
+      loading.hidden = false;
+      grid.hidden = true;
+      empty.hidden = true;
+
+      Promise.all(handles.map(function (h) {
+        return fetch('/products/' + h + '.js')
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+      })).then(function (results) {
+        var valid = results.filter(function (p) { return p; });
+        var validHandles = valid.map(function (p) { return p.handle; });
+        if (validHandles.length !== handles.length) writeHandles(validHandles);
+        render(valid);
+      });
+    }
+
+    load();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "settings": []
+}
+{% endschema %}

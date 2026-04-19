@@ -179,28 +179,38 @@
     </form>
 
     <div class="search-drawer__body">
-      <section class="search-drawer__section">
-        <h3 class="search-drawer__heading">Popular Searches:</h3>
-        <ul class="search-drawer__tag-list">
-          <li><a href="{{ routes.search_url }}?q=dress" class="search-drawer__tag">Dresses</a></li>
-          <li><a href="{{ routes.search_url }}?q=jacket" class="search-drawer__tag">Jackets</a></li>
-          <li><a href="{{ routes.search_url }}?q=shirt" class="search-drawer__tag">Shirts</a></li>
-          <li><a href="{{ routes.search_url }}?q=pants" class="search-drawer__tag">Pants</a></li>
-          <li><a href="{{ routes.search_url }}?q=travel" class="search-drawer__tag">Travel</a></li>
-          <li><a href="{{ routes.search_url }}?q=new+in" class="search-drawer__tag">New In</a></li>
-        </ul>
-      </section>
+      <div class="search-drawer__default" data-search-default>
+        <section class="search-drawer__section">
+          <h3 class="search-drawer__heading">Popular Searches:</h3>
+          <ul class="search-drawer__tag-list">
+            <li><a href="{{ routes.search_url }}?q=dress" class="search-drawer__tag">Dresses</a></li>
+            <li><a href="{{ routes.search_url }}?q=jacket" class="search-drawer__tag">Jackets</a></li>
+            <li><a href="{{ routes.search_url }}?q=shirt" class="search-drawer__tag">Shirts</a></li>
+            <li><a href="{{ routes.search_url }}?q=pants" class="search-drawer__tag">Pants</a></li>
+            <li><a href="{{ routes.search_url }}?q=travel" class="search-drawer__tag">Travel</a></li>
+            <li><a href="{{ routes.search_url }}?q=new+in" class="search-drawer__tag">New In</a></li>
+          </ul>
+        </section>
 
-      <section class="search-drawer__section" data-recent-section hidden>
-        <h3 class="search-drawer__heading">Recently Viewed</h3>
-        <div class="search-drawer__recent" data-recent-products></div>
-      </section>
+        <section class="search-drawer__section" data-recent-section hidden>
+          <h3 class="search-drawer__heading">Recently Viewed</h3>
+          <div class="search-drawer__recent" data-recent-products></div>
+        </section>
 
-      <section class="search-drawer__section search-drawer__section--empty" data-empty-section>
-        <p class="search-drawer__empty-text">
-          Start browsing to see recently viewed items here.
-        </p>
-      </section>
+        <section class="search-drawer__section search-drawer__section--empty" data-empty-section>
+          <p class="search-drawer__empty-text">
+            Start browsing to see recently viewed items here.
+          </p>
+        </section>
+      </div>
+
+      <div class="search-drawer__results" data-search-results hidden>
+        <div class="search-drawer__results-status" data-search-status aria-live="polite"></div>
+        <div class="search-drawer__results-grid" data-search-results-grid></div>
+        <a href="#" class="search-drawer__results-all" data-search-all hidden>
+          See all results for "<span data-search-all-query></span>"
+        </a>
+      </div>
     </div>
   </div>
 </dialog>
@@ -813,6 +823,83 @@
     margin: 0;
   }
 
+  /* Predictive search results */
+  .search-drawer__results-status {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 20px;
+    min-height: 14px;
+  }
+
+  .search-drawer__results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 24px 16px;
+  }
+
+  .search-drawer__result-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .search-drawer__result-img-wrap {
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  .search-drawer__result-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .search-drawer__result-card:hover .search-drawer__result-img {
+    transform: scale(1.03);
+  }
+
+  .search-drawer__result-vendor {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .search-drawer__result-title {
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+
+  .search-drawer__result-price {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .search-drawer__result-compare {
+    opacity: 0.5;
+    font-weight: 400;
+    margin-right: 6px;
+    text-decoration: line-through;
+  }
+
+  .search-drawer__results-all {
+    display: inline-block;
+    margin-top: 28px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-foreground);
+    padding-bottom: 3px;
+  }
+
   /* ─── Mobile bar ─────────────────────────────────────────────── */
   .header__mobile {
     display: none;
@@ -1141,6 +1228,99 @@
     if (searchDrawer) {
       searchDrawer.addEventListener('click', function (e) {
         if (e.target === searchDrawer) searchDrawer.close();
+      });
+    }
+
+    /* ─── Predictive search ─── */
+    if (searchDrawer && searchInput) {
+      var defaultPane = searchDrawer.querySelector('[data-search-default]');
+      var resultsPane = searchDrawer.querySelector('[data-search-results]');
+      var resultsGrid = searchDrawer.querySelector('[data-search-results-grid]');
+      var resultsStatus = searchDrawer.querySelector('[data-search-status]');
+      var resultsAll = searchDrawer.querySelector('[data-search-all]');
+      var resultsAllQuery = searchDrawer.querySelector('[data-search-all-query]');
+      var searchTimer = null;
+      var searchAbort = null;
+
+      function formatMoneySearch(cents) {
+        return '$ ' + (cents / 100).toFixed(2);
+      }
+
+      function showDefault() {
+        if (defaultPane) defaultPane.hidden = false;
+        if (resultsPane) resultsPane.hidden = true;
+      }
+
+      function showResults() {
+        if (defaultPane) defaultPane.hidden = true;
+        if (resultsPane) resultsPane.hidden = false;
+      }
+
+      function renderPredictive(query, products) {
+        if (!resultsGrid) return;
+        if (products.length === 0) {
+          resultsGrid.innerHTML = '';
+          resultsStatus.textContent = 'No results for "' + query + '"';
+          resultsAll.hidden = true;
+          return;
+        }
+        resultsStatus.textContent = products.length + (products.length === 1 ? ' result' : ' results');
+        resultsGrid.innerHTML = products.map(function (p) {
+          var img = p.featured_image
+            ? '<img src="' + p.featured_image.url + '" alt="' + (p.featured_image.alt || '') + '" loading="lazy" class="search-drawer__result-img">'
+            : '';
+          var vendor = p.vendor ? '<span class="search-drawer__result-vendor">' + p.vendor + '</span>' : '';
+          var compare = (p.compare_at_price_min && p.compare_at_price_min > p.price_min)
+            ? '<s class="search-drawer__result-compare">' + formatMoneySearch(p.compare_at_price_min) + '</s>'
+            : '';
+          return (
+            '<a href="' + p.url + '" class="search-drawer__result-card">' +
+              '<div class="search-drawer__result-img-wrap">' + img + '</div>' +
+              vendor +
+              '<span class="search-drawer__result-title">' + p.title + '</span>' +
+              '<span class="search-drawer__result-price">' + compare + formatMoneySearch(p.price_min) + '</span>' +
+            '</a>'
+          );
+        }).join('');
+        resultsAll.href = '/search?q=' + encodeURIComponent(query);
+        resultsAllQuery.textContent = query;
+        resultsAll.hidden = false;
+      }
+
+      function runPredictive(query) {
+        if (searchAbort) searchAbort.abort();
+        searchAbort = new AbortController();
+        resultsStatus.textContent = 'Searching…';
+        showResults();
+        var url = '/search/suggest.json?q=' + encodeURIComponent(query)
+          + '&resources[type]=product&resources[limit]=8&resources[options][unavailable_products]=last';
+        fetch(url, { signal: searchAbort.signal })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            var products = (data.resources && data.resources.results && data.resources.results.products) || [];
+            renderPredictive(query, products);
+          })
+          .catch(function (err) {
+            if (err.name !== 'AbortError') {
+              resultsStatus.textContent = 'Search unavailable';
+            }
+          });
+      }
+
+      searchInput.addEventListener('input', function () {
+        var query = searchInput.value.trim();
+        clearTimeout(searchTimer);
+        if (query.length < 2) {
+          if (searchAbort) searchAbort.abort();
+          showDefault();
+          return;
+        }
+        searchTimer = setTimeout(function () { runPredictive(query); }, 200);
+      });
+
+      searchDrawer.addEventListener('close', function () {
+        searchInput.value = '';
+        showDefault();
       });
     }
 
