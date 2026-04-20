@@ -332,10 +332,10 @@
         <span class="cart-drawer__subtotal-label">Subtotal</span>
         <span class="cart-drawer__subtotal-price" data-cart-subtotal></span>
       </div>
-      <p class="cart-drawer__note">Taxes and shipping calculated at checkout.</p>
-      <form action="/cart" method="post">
-        <button type="submit" name="checkout" class="cart-drawer__checkout">Checkout</button>
-      </form>
+      <p class="cart-drawer__note">Demo store — checkout is disabled. No real orders are processed.</p>
+      <button type="button" class="cart-drawer__checkout cart-drawer__checkout--disabled" disabled aria-disabled="true">
+        Checkout disabled (demo)
+      </button>
     </div>
   </div>
 </dialog>
@@ -405,6 +405,7 @@
     position: relative;
     z-index: 3;
     background-color: var(--color-background);
+    padding: 0px 14px;
   }
 
   .header__left {
@@ -957,6 +958,7 @@
       align-items: center;
       padding: 0 var(--page-margin);
       height: 3.5rem;
+      padding: 0px 14px;
     }
 
     .header__mobile-menu-btn {
@@ -1453,6 +1455,13 @@
 
   .cart-drawer__checkout:hover {
     opacity: 0.85;
+  }
+
+  .cart-drawer__checkout--disabled,
+  .cart-drawer__checkout--disabled:hover {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 1;
   }
 
   @media (max-width: 500px) {

@@ -1,6 +1,8 @@
 <div class="topbar full-width">
   <p class="topbar__announcement">
-    {{ 'topbar.announcement_text' | t }}
+    <span class="topbar__demo-dot" aria-hidden="true"></span>
+    <span class="topbar__text topbar__text--full">Demo store · No real orders are processed — built by <a href="https://aldama.agency" target="_blank" rel="noopener" class="topbar__demo-link">Aldama Agency</a></span>
+    <span class="topbar__text topbar__text--short">Demo · built by <a href="https://aldama.agency" target="_blank" rel="noopener" class="topbar__demo-link">Aldama</a></span>
   </p>
 </div>
 
@@ -19,6 +21,50 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-align: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+  .topbar__demo-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f59e0b;
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55);
+    animation: topbar-demo-pulse 1.8s infinite;
+  }
+  @keyframes topbar-demo-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55); }
+    70%  { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+  }
+  .topbar__demo-link {
+    color: inherit;
+    text-underline-offset: 2px;
+    font-weight: 500;
+    text-decoration: none;
+    text-transform: capitalize;
+    line-height: 1.2;
+    letter-spacing: auto;
+  }
+  .topbar__text--short { display: none; }
+
+  @media (max-width: 600px) {
+    .topbar {
+      padding: 0.45rem 0.75rem;
+    }
+    .topbar__announcement {
+      font-size: 0.62rem;
+      letter-spacing: 0.04em;
+      gap: 6px;
+    }
+    .topbar__demo-dot {
+      width: 6px;
+      height: 6px;
+    }
+    .topbar__text--full { display: none; }
+    .topbar__text--short { display: inline; }
   }
 {% endstylesheet %}
 
