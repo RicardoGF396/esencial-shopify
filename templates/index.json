@@ -13,15 +13,22 @@
         "heading": "New In"
       },
       "blocks": {
-        "tab-new-in": {
+        "tab-abiti": {
           "type": "collection_tab",
           "settings": {
-            "tab_label": "New In",
-            "collection": "new-in"
+            "tab_label": "Abiti",
+            "collection": "abiti"
+          }
+        },
+        "tab-bluse": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Bluse",
+            "collection": "bluse"
           }
         }
       },
-      "block_order": ["tab-new-in"]
+      "block_order": ["tab-abiti", "tab-bluse"]
     },
     "carousel-main-ss26": {
       "type": "collection-carousel",
@@ -29,15 +36,22 @@
         "heading": "Main SS26"
       },
       "blocks": {
-        "tab-main": {
+        "tab-giacche": {
           "type": "collection_tab",
           "settings": {
-            "tab_label": "Main SS26",
-            "collection": "main-ss26"
+            "tab_label": "Giacche",
+            "collection": "giacche"
+          }
+        },
+        "tab-pantaloni": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Pantaloni",
+            "collection": "pantaloni"
           }
         }
       },
-      "block_order": ["tab-main"]
+      "block_order": ["tab-giacche", "tab-pantaloni"]
     },
     "dual-image-1": {
       "type": "dual-image",
@@ -63,15 +77,22 @@
         "heading": "Travel Capsule"
       },
       "blocks": {
-        "tab-travel": {
+        "tab-tshirts": {
           "type": "collection_tab",
           "settings": {
-            "tab_label": "Travel Capsule",
-            "collection": "travel-capsule"
+            "tab_label": "T-shirts",
+            "collection": "t-shirts"
+          }
+        },
+        "tab-maglie": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Maglie",
+            "collection": "maglie"
           }
         }
       },
-      "block_order": ["tab-travel"]
+      "block_order": ["tab-tshirts", "tab-maglie"]
     },
     "dual-image-2": {
       "type": "dual-image",
@@ -137,9 +158,16 @@
             "tab_label": "Archive",
             "collection": "archive"
           }
+        },
+        "tab-top": {
+          "type": "collection_tab",
+          "settings": {
+            "tab_label": "Top",
+            "collection": "top"
+          }
         }
       },
-      "block_order": ["tab-archive"]
+      "block_order": ["tab-archive", "tab-top"]
     },
     "instagram-grid": {
       "type": "instagram-grid",
