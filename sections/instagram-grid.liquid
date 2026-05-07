@@ -15,52 +15,61 @@
     {% endif %}
   </div>
 
-  <div class="instagram-grid__grid">
-    {% for block in section.blocks %}
-      {% if block.type == 'post' %}
-        <div class="instagram-grid__item" {{ block.shopify_attributes }}>
-          {% if block.settings.link != blank %}
-            <a
-              href="{{ block.settings.link }}"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="instagram-grid__link"
-            >
-          {% endif %}
+  {%- comment -%}
+    Build the list of images for the grid:
+    1. Start with images defined in section blocks (file picker or external URL).
+    2. If we have fewer than 12 entries, top up with product featured images
+       from the chosen collection (default: collections.all).
+    All tiles link to the Instagram profile URL.
+  {%- endcomment -%}
 
-          {% if block.settings.image != blank %}
+  {%- assign tiles = '' -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'post' -%}
+      {%- if block.settings.image != blank -%}
+        {%- assign img_url = block.settings.image | image_url: width: 600, height: 600, crop: 'center' -%}
+        {%- assign tiles = tiles | append: img_url | append: '|||' -%}
+      {%- elsif block.settings.image_url != blank -%}
+        {%- assign tiles = tiles | append: block.settings.image_url | append: '|||' -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- assign rec = collections[section.settings.fallback_collection] -%}
+  {%- if rec == blank -%}{%- assign rec = collections.all -%}{%- endif -%}
+
+  {%- for p in rec.products -%}
+    {%- if p.featured_image != blank -%}
+      {%- assign pimg = p.featured_image | image_url: width: 600, height: 600, crop: 'center' -%}
+      {%- assign tiles = tiles | append: pimg | append: '|||' -%}
+    {%- endif -%}
+    {%- if forloop.index >= 24 -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+
+  {%- assign tile_list = tiles | split: '|||' -%}
+  {%- assign target_url = section.settings.instagram_url | default: 'https://www.instagram.com/' -%}
+
+  <div class="instagram-grid__grid">
+    {%- for src in tile_list limit: 12 -%}
+      {%- if src != '' -%}
+        <div class="instagram-grid__item">
+          <a
+            href="{{ target_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="instagram-grid__link"
+            aria-label="Open Instagram"
+          >
             <img
-              src="{{ block.settings.image | image_url: width: 500, height: 500, crop: 'center' }}"
-              alt="{{ block.settings.image.alt | escape }}"
-              loading="lazy"
-              width="500"
-              height="500"
-              class="instagram-grid__img"
-            >
-          {% elsif block.settings.image_url != blank %}
-            <img
-              src="{{ block.settings.image_url }}"
+              src="{{ src }}"
               alt=""
               loading="lazy"
               class="instagram-grid__img"
             >
-          {% else %}
-            <div class="instagram-grid__placeholder">
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <circle cx="14" cy="14" r="5" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                <circle cx="21" cy="7" r="1.5" fill="currentColor"/>
-              </svg>
-              <span>Add image</span>
-            </div>
-          {% endif %}
-
-          {% if block.settings.link != blank %}
-            </a>
-          {% endif %}
+          </a>
         </div>
-      {% endif %}
-    {% endfor %}
+      {%- endif -%}
+    {%- endfor -%}
   </div>
 </div>
 
@@ -181,6 +190,11 @@
       "type": "url",
       "id": "instagram_url",
       "label": "Instagram profile URL"
+    },
+    {
+      "type": "collection",
+      "id": "fallback_collection",
+      "label": "Fallback collection (used when blocks don't have images)"
     }
   ],
   "blocks": [
